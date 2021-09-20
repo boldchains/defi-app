@@ -1,4 +1,5 @@
-import { Box, Button, Typography } from '@material-ui/core';
+import { Button, Typography, Box } from '@mui/material';
+import { grey, indigo } from '@mui/material/colors';
 import React from 'react';
 
 const Navbar = () => {
@@ -6,14 +7,25 @@ const Navbar = () => {
     <Box
       sx={{
         p: 2,
-        bgcolor: 'primary.light',
+        bgcolor: indigo[500],
+        color: 'white',
         display: 'flex',
         justifyContent: 'space-between',
       }}>
       <Typography variant="h6" component="h6">
         Defi App
       </Typography>
-      <Button variant="contained">Connect Wallet</Button>
+      <Button
+        color="primary"
+        variant="outlined"
+        sx={{
+          bgcolor: 'white',
+          '&:hover': {
+            bgcolor: 'white',
+          },
+        }}>
+        Connect Wallet
+      </Button>
     </Box>
   );
 };

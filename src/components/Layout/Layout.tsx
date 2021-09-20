@@ -1,3 +1,4 @@
+import { Box } from '@mui/system';
 import React, { ReactNode } from 'react';
 import Navbar from '../Navbar/Navbar';
 
@@ -9,7 +10,13 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <>
       <Navbar />
-      <main>{children}</main>
+      <Box
+        component="main"
+        height="calc(100vh - 68px)"
+        display="flex"
+        alignItems="center">
+        {children}
+      </Box>
     </>
   );
 };

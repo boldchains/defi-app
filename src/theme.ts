@@ -1,12 +1,19 @@
-import { createTheme, ThemeOptions } from '@material-ui/core';
-import { indigo } from '@material-ui/core/colors';
+import { createTheme } from '@mui/material/styles';
+import { grey, indigo, red } from '@mui/material/colors';
 
-export const lightThemeOption: ThemeOptions = {
+// Create a theme instance.
+const theme = createTheme({
   palette: {
     primary: {
-      main: indigo[900],
+      main: indigo[500],
+    },
+    secondary: {
+      main: grey[100],
+    },
+    error: {
+      main: red.A400,
     },
   },
-};
+});
 
-export const lightTheme = createTheme(lightThemeOption);
+export default theme;

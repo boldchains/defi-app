@@ -1,11 +1,13 @@
 import { useEffect } from 'react';
 import { AppProps } from 'next/app';
+import { Provider } from 'react-redux';
 import { Web3ReactProvider } from '@web3-react/core';
 import { Web3Provider } from '@ethersproject/providers';
 import { Web3ReactContextInterface } from '@web3-react/core/dist/types';
-import { ThemeProvider } from '@material-ui/styles';
+import { ThemeProvider } from '@emotion/react';
+import { store } from '../redux/store';
 import { Layout } from '../components';
-import { lightTheme } from '../theme';
+import theme from '../theme';
 import '../styles/globals.css';
 
 const getLibrary = (
@@ -25,10 +27,12 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <Web3ReactProvider getLibrary={getLibrary}>
-      <ThemeProvider theme={lightTheme}>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
+      <ThemeProvider theme={theme}>
+        <Provider store={store}>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </Provider>
       </ThemeProvider>
     </Web3ReactProvider>
   );
