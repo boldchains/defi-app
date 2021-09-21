@@ -2,7 +2,7 @@ import { Button, Typography, Box } from '@mui/material';
 import { indigo } from '@mui/material/colors';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import React from 'react';
-import { injected, ledger } from '../../connectors';
+import { injected, ledger } from '../../context/connectors';
 import { Account, Balance } from '..';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { LedgerConnector } from '@web3-react/ledger-connector';
