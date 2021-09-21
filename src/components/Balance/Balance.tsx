@@ -36,7 +36,7 @@ const Balance = () => {
       {balance === null
         ? 'Error'
         : balance
-        ? `${formatEther(balance)} ETH`
+        ? `${parseFloat(formatEther(balance)).toFixed(2)} ETH`
         : ''}
     </Box>
   );

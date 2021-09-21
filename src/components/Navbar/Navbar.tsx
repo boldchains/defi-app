@@ -1,22 +1,22 @@
-import { Button, Typography, Box } from '@mui/material';
-import { indigo } from '@mui/material/colors';
-import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import React from 'react';
-import { injected, ledger } from '../../context/connectors';
-import { Account, Balance } from '..';
+import { indigo } from '@mui/material/colors';
+import { Button, Typography, Box } from '@mui/material';
 import { InjectedConnector } from '@web3-react/injected-connector';
-import { LedgerConnector } from '@web3-react/ledger-connector';
+import { NetworkConnector } from '@web3-react/network-connector';
+import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
+import { injected, network } from '../../context/connectors';
+import { Account, Balance } from '..';
 
 enum ConnectorNames {
   Injected = 'Injected',
-  Ledger = 'Ledger',
+  Network = 'Network',
 }
 
 const connectorsByName: {
-  [connectorName in ConnectorNames]: InjectedConnector | LedgerConnector;
+  [connectorName in ConnectorNames]: InjectedConnector | NetworkConnector;
 } = {
   [ConnectorNames.Injected]: injected,
-  [ConnectorNames.Ledger]: ledger,
+  [ConnectorNames.Network]: network,
 };
 
 const Navbar = () => {
