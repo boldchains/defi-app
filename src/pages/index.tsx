@@ -2,59 +2,53 @@ import type { NextPage } from 'next';
 import React, { useEffect, useState } from 'react';
 import { Button, Container, TextField, Box } from '@mui/material';
 import { Web3Provider } from '@ethersproject/providers';
-import { TransactionResponse } from '@ethersproject/abstract-provider';
 import { useWeb3React } from '@web3-react/core';
-import { getERC20Contract } from '../context/contracts';
-import { formatEther, parseEther } from '@ethersproject/units';
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { accountSelector } from '../redux/account/selectors';
+import { getWeakBalance } from '../redux/account/actions';
+import { transactionSelector } from '../redux/transaction/selectors';
+import { transferTx, waitTx } from '../redux/transaction/actions';
 
 const Home: NextPage = () => {
-  const trasferFormRef = React.useRef<HTMLFormElement>(null);
+  const dispatch = useAppDispatch();
+  const transferFormRef = React.useRef<HTMLFormElement>(null);
   const { library, account } = useWeb3React<Web3Provider>();
-  const cont = getERC20Contract(library);
-  const [daiBalance, setDaiBalance] = useState<string>('');
+  const { weakBalance } = useAppSelector(accountSelector);
+  const { pending, tx } = useAppSelector(transactionSelector);
   const [amount, setAmount] = useState<string>();
   const [accountTo, setAccountTo] = useState<string>();
-  const [submitted, setSubmitted] = useState<boolean>(false);
-  const [pendingTx, setPendingTx] = useState<TransactionResponse>();
 
   useEffect(() => {
-    if (library) {
-      cont.balanceOf(account).then((bal: any) => setDaiBalance(bal));
+    dispatch(getWeakBalance({ library, account }));
+  }, [library, account, pending]);
+
+  useEffect(() => {
+    const clearForm = () => {
+      transferFormRef.current?.reset();
+      setAmount('');
+      setAccountTo('');
+    };
+
+    if (tx && pending) {
+      dispatch(waitTx(tx));
     }
-  }, [library, account, pendingTx]);
+    if (!pending) {
+      clearForm();
+    }
+  }, [pending, tx]);
 
   const handleSubmitTransfer = (e: React.SyntheticEvent) => {
     e.preventDefault();
 
     if (!amount || !accountTo) return;
 
-    cont
-      .transfer(accountTo, parseEther(amount))
-      .then((tx: TransactionResponse) => {
-        setPendingTx(tx);
-        tx.wait().then((confirms) => {
-          if (confirms) {
-            setPendingTx(undefined);
-          }
-        });
-      })
-      .catch((e: Error) => {
-        console.error(e);
-      })
-      .finally(() => {
-        setSubmitted(false);
-        trasferFormRef.current?.reset();
-        setAccountTo('');
-        setAmount('');
-      });
-
-    setSubmitted(true);
+    dispatch(transferTx({ library, transferTo: accountTo, amount }));
   };
 
   return (
     <Container maxWidth="xs">
       <form
-        ref={trasferFormRef}
+        ref={transferFormRef}
         onSubmit={handleSubmitTransfer}
         noValidate
         autoComplete="off">
@@ -63,7 +57,7 @@ const Home: NextPage = () => {
             id="dai-amount"
             label="Enter DAI Amount"
             helperText={`Balance: ${
-              daiBalance && parseFloat(formatEther(daiBalance)).toFixed(2)
+              weakBalance ? parseFloat(weakBalance).toFixed(2) : '0'
             } DAI`}
             variant="filled"
             fullWidth
@@ -90,17 +84,17 @@ const Home: NextPage = () => {
             variant="contained"
             color="primary"
             fullWidth
-            disabled={submitted || !amount || !accountTo}>
+            disabled={pending || !amount || !accountTo}>
             Send
           </Button>
         </Box>
-        {pendingTx && (
+        {pending && (
           <Box mt={4} paddingX={4}>
             <Button
               variant="contained"
               color="primary"
               fullWidth
-              href={`${process.env.ETHERSCAN_URL}tx/${pendingTx?.hash}`}
+              href={`${process.env.ETHERSCAN_URL}tx/${tx?.hash}`}
               sx={{ textTransform: 'capitalize' }}
               target="_blank">
               View on Etherscan

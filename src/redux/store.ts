@@ -1,10 +1,16 @@
 import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
-import transactionReducer from './reducers/transactionSlice';
+import accountReducer from './account/reducer';
+import transactionReducer from './transaction/reducer';
 
 export const store = configureStore({
   reducer: {
+    account: accountReducer,
     transaction: transactionReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 });
 
 export type AppDispatch = typeof store.dispatch;
