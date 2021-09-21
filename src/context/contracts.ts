@@ -2,7 +2,7 @@ import { Contract } from '@ethersproject/contracts';
 import { Web3Provider } from '@ethersproject/providers';
 import { daiAbi } from './abi/dai';
 
-const ERC20_ADDR = process.env.erc20_address || '';
+const ERC20_ADDR = process.env.ERC20_ADDRESS || '';
 
 /**
  * ERC20 Contract instance

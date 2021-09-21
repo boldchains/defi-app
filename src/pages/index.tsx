@@ -2,10 +2,10 @@ import type { NextPage } from 'next';
 import React, { useEffect, useState } from 'react';
 import { Button, Container, TextField, Box } from '@mui/material';
 import { Web3Provider } from '@ethersproject/providers';
+import { TransactionResponse } from '@ethersproject/abstract-provider';
 import { useWeb3React } from '@web3-react/core';
 import { getERC20Contract } from '../context/contracts';
 import { formatEther, parseEther } from '@ethersproject/units';
-import { ErrorCode } from '@ethersproject/logger';
 
 const Home: NextPage = () => {
   const trasferFormRef = React.useRef<HTMLFormElement>(null);
@@ -15,12 +15,13 @@ const Home: NextPage = () => {
   const [amount, setAmount] = useState<string>();
   const [accountTo, setAccountTo] = useState<string>();
   const [submitted, setSubmitted] = useState<boolean>(false);
+  const [pendingTx, setPendingTx] = useState<TransactionResponse>();
 
   useEffect(() => {
     if (library) {
       cont.balanceOf(account).then((bal: any) => setDaiBalance(bal));
     }
-  }, [library, account]);
+  }, [library, account, pendingTx]);
 
   const handleSubmitTransfer = (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -29,11 +30,16 @@ const Home: NextPage = () => {
 
     cont
       .transfer(accountTo, parseEther(amount))
-      .then((res: any) => {
-        console.log(res);
+      .then((tx: TransactionResponse) => {
+        setPendingTx(tx);
+        tx.wait().then((confirms) => {
+          if (confirms) {
+            setPendingTx(undefined);
+          }
+        });
       })
       .catch((e: Error) => {
-        console.log(e);
+        console.error(e);
       })
       .finally(() => {
         setSubmitted(false);
@@ -54,7 +60,9 @@ const Home: NextPage = () => {
           <TextField
             id="dai-amount"
             label="Enter DAI Amount"
-            helperText={`Balance: ${daiBalance && formatEther(daiBalance)} DAI`}
+            helperText={`Balance: ${
+              daiBalance && parseFloat(formatEther(daiBalance)).toFixed(2)
+            } DAI`}
             variant="filled"
             fullWidth
             inputProps={{
@@ -82,6 +90,19 @@ const Home: NextPage = () => {
             Send
           </Button>
         </Box>
+        {pendingTx && (
+          <Box mt={4} paddingX={4}>
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              href={`${process.env.ETHERSCAN_URL}tx/${pendingTx?.hash}`}
+              sx={{ textTransform: 'capitalize' }}
+              target="_blank">
+              View on Etherscan
+            </Button>
+          </Box>
+        )}
       </form>
     </Container>
   );
