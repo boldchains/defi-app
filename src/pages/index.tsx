@@ -44,6 +44,8 @@ const Home: NextPage = () => {
       .finally(() => {
         setSubmitted(false);
         trasferFormRef.current?.reset();
+        setAccountTo('');
+        setAmount('');
       });
 
     setSubmitted(true);
@@ -68,6 +70,7 @@ const Home: NextPage = () => {
             inputProps={{
               pattern: /([0-9]*[.])?[0-9]+/,
             }}
+            required
             onChange={(e) => setAmount(e.target.value)}
           />
         </Box>
@@ -77,6 +80,7 @@ const Home: NextPage = () => {
             label="Enter recipients address"
             variant="filled"
             fullWidth
+            required
             onChange={(e) => setAccountTo(e.target.value)}
           />
         </Box>
@@ -86,7 +90,7 @@ const Home: NextPage = () => {
             variant="contained"
             color="primary"
             fullWidth
-            disabled={submitted}>
+            disabled={submitted || !amount || !accountTo}>
             Send
           </Button>
         </Box>
